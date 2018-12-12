@@ -1,0 +1,29 @@
+{
+  "name": "express-mongo-demo",
+  "version": "1.0.0",
+  "description": "express mongo demo app",
+  "main": "index.js",
+  "dependencies": {
+    "express": "^4.16.4",
+    "next": "^7.0.2",
+    "react": "^16.6.3",
+    "react-dom": "^16.6.3"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "dev": "node server.js",
+    "build": "next build",
+    "start": "next start"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/supromikali/express-mongo-demo.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/supromikali/express-mongo-demo/issues"
+  },
+  "homepage": "https://github.com/supromikali/express-mongo-demo#readme"
+}
