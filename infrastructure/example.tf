@@ -2,12 +2,18 @@ provider "aws" {
   region     = "us-east-1"
 }
 
-data "aws_vpc" "default" {
-  default = true
+resource "aws_vpc" "main" {
+  cidr_block = "10.0.0.0/16"
 }
 
-data "aws_subnet_ids" "all" {
-  vpc_id = "${data.aws_vpc.default.id}"
+resource "aws_subnet" "main" {
+  vpc_id                  = "${aws_vpc.main.id}"
+  cidr_block              = "10.0.0.0/24"
+  availability_zone       = "us-east-1c"
+
+  tags = {
+    Name = "main subnet"
+  }
 }
 
 data "aws_ami" "ubuntu" {
@@ -26,27 +32,40 @@ data "aws_ami" "ubuntu" {
   owners = ["099720109477"] # Canonical
 }
 
-module "security_group" {
-  source      = "terraform-aws-modules/security-group/aws"
-  version     = "2.7.0"
+resource "aws_security_group" "main" {
+	name = "main"
+	description = "Allow SSH TCP Security Group"
 
-  name        = "example"
-  description = "Security group"
-  vpc_id      = "${data.aws_vpc.default.id}"
+	ingress {
+		from_port = 80
+		to_port = 80
+		protocol = "tcp"
+		cidr_blocks = ["0.0.0.0/0"]
+	}
 
-  ingress_cidr_blocks = ["0.0.0.0/0"]
-  ingress_rules       = ["http-80-tcp", "all-icmp"]
-  egress_rules        = ["all-all"]
+	ingress {
+		from_port = 22
+		to_port = 22
+		protocol = "tcp"
+		cidr_blocks = ["0.0.0.0/0"]
+	}
+
+	egress {
+		from_port = 0
+		to_port = 0
+		protocol = "-1"
+		cidr_blocks = ["0.0.0.0/0"]
+	}
 }
 
 resource "aws_instance" "web" {
   ami           = "${data.aws_ami.ubuntu.id}"
   instance_type = "t2.micro"
 
-  subnet_id                   = "${element(data.aws_subnet_ids.all.ids, 0)}"
-  vpc_security_group_ids      = ["${module.security_group.this_security_group_id}"]
+  subnet_id                   = "${aws_subnet.main.id}"
+  vpc_security_group_ids      = ["${aws_security_group.main.name}"]
 
   tags {
-    Name = "HelloWorld"
+    Name = "web"
   }
 }
