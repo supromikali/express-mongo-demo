@@ -6,7 +6,7 @@ resource "aws_vpc" "main" {
   cidr_block = "10.0.0.0/16"
 }
 
-resource "aws_subnet" "public_subnet" {
+resource "aws_subnet" "main-subnet" {
   vpc_id            = "${aws_vpc.main.id}"
   cidr_block        = "10.0.0.0/24"
   availability_zone = "us-east-1c"
@@ -74,7 +74,7 @@ resource "aws_instance" "express-mongo-demo" {
   ami           = "${data.aws_ami.ubuntu.id}"
   instance_type = "t2.micro"
 
-  subnet_id              = "${aws_subnet.public_subnet.id}"
+  subnet_id              = "${aws_subnet.main-subnet.id}"
   vpc_security_group_ids = ["${aws_security_group.allow-ssh-http-ping.name}"]
 
   tags {
